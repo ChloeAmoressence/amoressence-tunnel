@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amoressence — Tu as fait le premier pas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garant:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=Lora:ital@1&display=swap" rel="stylesheet">
+
+  <style>
+    /* ===========================
+       Variables
+    =========================== */
+    :root {
+      --bg:               #FAF6F1;
+      --bg-color:         #EFE4D4;
+      --terracotta:       #C9856A;
+      --rose:             #E8C4B8;
+      --text:             #2C1810;
+      --text-sub:         #7A5C52;
+      --trans:            0.4s ease-in-out;
+      --grain-opacity:    0.09;
+      --vignette-opacity: 0.16;
+    }
+
+    /* ===========================
+       Reset & base
+    =========================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 400;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 64px 20px 96px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Vignettage progressif */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9998;
+      background: radial-gradient(ellipse at center, transparent 40%, rgba(44,24,16,var(--vignette-opacity)) 100%);
+    }
+
+    /* Grain texture */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: var(--grain-opacity);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-size: 300px 300px;
+    }
+
+    /* ===========================
+       Container
+    =========================== */
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 640px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ===========================
+       Marque
+    =========================== */
+    .brand-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 56px;
+      opacity: 0;
+      animation: fadeInUp 0.6s ease-in-out 0.1s both;
+    }
+
+    .brand-name {
+      font-family: 'Cormorant Garant', serif;
+      font-size: clamp(1rem, 3vw, 1.35rem);
+      font-weight: 300;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: var(--terracotta);
+    }
+
+    .brand-divider {
+      width: 36px;
+      height: 1px;
+      background: var(--rose);
+    }
+
+    /* ===========================
+       BLOC 1 — Séquence d'ouverture
+    =========================== */
+    #openingZone {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      margin-bottom: 56px;
+    }
+
+    .typewriter-line {
+      font-family: 'Lora', serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: clamp(1.2rem, 3.5vw, 1.6rem);
+      color: #5C3B2E;
+      line-height: 1.65;
+      width: 100%;
+      min-height: 1.65em;
+    }
+
+    #line1 { margin-bottom: 20px; }
+
+    /* ===========================
+       BLOC 2 — VSL  +  BLOC 3 — Bouton Calendly
+    =========================== */
+    #vslSection {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      margin-bottom: 56px;
+      opacity: 0;
+      transition: opacity 900ms ease-in-out;
+      pointer-events: none;
+    }
+
+    #vslSection.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .video-container {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%;
+      height: 0;
+      overflow: hidden;
+      border-radius: 18px;
+      box-shadow: 0 16px 48px rgba(44,24,16,0.12), 0 2px 8px rgba(44,24,16,0.06);
+    }
+
+    .video-container iframe {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      border: none;
+      border-radius: 18px;
+    }
+
+    /* ===========================
+       Bouton Calendly (bloc 3 + bloc CTA)
+    =========================== */
+    .calendly-btn {
+      display: block;
+      width: 100%;
+      padding: 18px 28px;
+      background: var(--terracotta);
+      color: #FFF9F6;
+      border-radius: 50px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      text-decoration: none;
+      text-align: center;
+      cursor: pointer;
+      border: none;
+      transition: background var(--trans), transform 0.3s ease-in-out, box-shadow var(--trans);
+    }
+
+    .calendly-btn:hover {
+      background: #b87460;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(201,133,106,0.28);
+    }
+
+    .calendly-btn:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    /* ===========================
+       BLOC 4 — Champ interactif
+    =========================== */
+    #chatSection {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      opacity: 0;
+      transition: opacity 900ms ease-in-out;
+      pointer-events: none;
+    }
+
+    #chatSection.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Boutons de choix */
+    #choiceBtns {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      transition: opacity 400ms ease-in-out;
+    }
+
+    .choice-btn {
+      padding: 11px 20px;
+      border: 1.5px solid var(--terracotta);
+      background: transparent;
+      color: var(--terracotta);
+      border-radius: 50px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background var(--trans), color var(--trans);
+    }
+
+    .choice-btn:hover {
+      background: var(--terracotta);
+      color: #FFF9F6;
+    }
+
+    /* Ligne input + envoyer */
+    .input-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .chat-input {
+      flex: 1;
+      padding: 14px 20px;
+      background: rgba(255,255,255,0.7);
+      border: 1.5px solid var(--rose);
+      border-radius: 50px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      color: var(--text);
+      outline: none;
+      transition: border-color var(--trans), box-shadow var(--trans), opacity 600ms ease-in-out, filter 600ms ease-in-out;
+    }
+
+    .chat-input::placeholder { color: var(--text-sub); opacity: 0.7; }
+
+    .chat-input:focus {
+      border-color: var(--terracotta);
+      box-shadow: 0 0 0 3px rgba(201,133,106,0.12);
+    }
+
+    .chat-input:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .send-btn {
+      padding: 14px 22px;
+      background: var(--terracotta);
+      color: #FFF9F6;
+      border: none;
+      border-radius: 50px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background var(--trans), transform 0.2s;
+    }
+
+    .send-btn:hover { background: #b87460; transform: translateY(-1px); }
+    .send-btn:active { transform: translateY(0); }
+
+    /* ===========================
+       BLOC 5 — Zone de réponses
+    =========================== */
+    #responseZone {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      margin-top: 40px;
+    }
+
+    .response-text {
+      width: 100%;
+      font-family: 'Lora', serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: clamp(1.2rem, 3.5vw, 1.6rem);
+      color: #5C3B2E;
+      line-height: 1.65;
+      transition: opacity 600ms ease-in-out, filter 600ms ease-in-out;
+    }
+
+    /* Témoignages inline */
+    .testimonials-mini {
+      display: flex;
+      flex-direction: row;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .testimonial-card {
+      flex: 1;
+      min-width: 0;
+      background: rgba(255,255,255,0.65);
+      border: 1.5px solid var(--rose);
+      border-radius: 16px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .testimonial-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .testimonial-photo-placeholder {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(160deg, var(--rose) 0%, #D4A895 100%);
+      flex-shrink: 0;
+    }
+
+    .testimonial-name {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .testimonial-context {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.76rem;
+      color: var(--text-sub);
+      margin-top: 1px;
+    }
+
+    .testimonial-text {
+      font-family: 'Cormorant Garant', serif;
+      font-style: italic;
+      font-size: clamp(0.95rem, 2.5vw, 1.1rem);
+      color: var(--text);
+      line-height: 1.65;
+    }
+
+    .testimonial-video {
+      width: 100%;
+      border-radius: 12px;
+      display: block;
+      background: #000;
+    }
+
+    /* CTA au 3ème échange */
+    .cta-block {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      opacity: 0;
+      transition: opacity 900ms ease-in-out;
+    }
+
+    .cta-block.visible { opacity: 1; }
+
+    .cta-nudge {
+      font-family: 'Lora', serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: clamp(1.2rem, 3.5vw, 1.6rem);
+      color: #5C3B2E;
+      line-height: 1.65;
+      text-align: center;
+    }
+
+    /* ===========================
+       Message Chloé
+    =========================== */
+    .chloe-message {
+      display: flex;
+      flex-direction: column;
+      gap: 26px;
+      width: 100%;
+      margin: 48px 0;
+    }
+
+    .chloe-para {
+      font-family: 'Lora', serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: clamp(1.2rem, 3.5vw, 1.6rem);
+      color: #5C3B2E;
+      line-height: 1.65;
+      text-align: left;
+    }
+
+    .chloe-signature {
+      font-family: 'Cormorant Garant', serif;
+      font-weight: 400;
+      font-size: clamp(1rem, 2.8vw, 1.2rem);
+      color: var(--terracotta);
+      letter-spacing: 0.05em;
+      margin-top: 8px;
+    }
+
+    /* ===========================
+       Animations
+    =========================== */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===========================
+       Mobile
+    =========================== */
+    @media (max-width: 480px) {
+      body { padding: 48px 16px 88px; }
+      .brand-header { margin-bottom: 40px; }
+      #openingZone { margin-bottom: 40px; }
+      #vslSection { margin-bottom: 40px; }
+      .response-text { padding: 18px 20px; }
+      .choice-btn { font-size: 0.83rem; padding: 10px 16px; }
+      .testimonials-mini { flex-direction: column; }
+    }
+
+    /* ===========================
+       Footer légal
+    =========================== */
+    .legal-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 10000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      padding: 10px 20px;
+      background: rgba(239, 228, 212, 0.90);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .legal-footer a {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.7rem;
+      color: var(--text-sub);
+      text-decoration: none;
+      letter-spacing: 0.02em;
+      transition: color 0.3s ease;
+    }
+
+    .legal-footer a:hover { color: var(--terracotta); }
+
+    .legal-footer-sep {
+      color: var(--rose);
+      font-size: 0.7rem;
+      user-select: none;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- Marque -->
+  <header class="brand-header">
+    <p class="brand-name">Amoressence</p>
+    <div class="brand-divider" aria-hidden="true"></div>
+  </header>
+
+  <!-- ================================
+       BLOC 1 — Séquence d'ouverture
+  ================================= -->
+  <div id="openingZone" aria-live="polite">
+    <p class="typewriter-line" id="line1" style="display:none"></p>
+    <div class="chloe-message" id="chloeBlock" style="display:none">
+      <p class="chloe-para">Il y a une période de ma vie où je pensais sincèrement que certaines femmes étaient simplement faites pour être aimées… et d'autres non.</p>
+      <p class="chloe-para">Avec le temps, j'ai compris à quel point certaines relations peuvent nous éloigner de nous-mêmes, jusqu'à nous faire croire que la solitude est une fatalité.</p>
+      <p class="chloe-para">C'est pour cette raison que j'ai créé cet espace.</p>
+    </div>
+    <p class="typewriter-line" id="line2" style="display:none"></p>
+  </div>
+
+  <!-- ================================
+       BLOC 2 — VSL
+       Remplacer VIDEO_ID par l'identifiant YouTube de la VSL.
+  ================================= -->
+  <div id="vslSection">
+
+    <div class="video-container" aria-label="Message vidéo de Chloé">
+      <!-- Remplacer VIDEO_ID par l'identifiant YouTube de la VSL -->
+      <iframe
+        id="ytPlayer"
+        src="https://www.youtube.com/embed/9ZPV7HtWtQA?enablejsapi=1"
+        title="VSL Amoressence"
+        frameborder="0"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen>
+      </iframe>
+    </div>
+
+    <!-- BLOC 3 — Bouton Calendly -->
+    <!-- Remplacer href="#" par l'URL Calendly de Chloé -->
+    <a href="https://calendly.com/chloe-facilitationequine/30min" id="calendlyBtn" class="calendly-btn" target="_blank" rel="noopener" style="opacity:0;pointer-events:none">Je veux parler à Chloé</a>
+
+    <p id="universeText" class="chloe-para" style="opacity:0; margin-top:32px">
+      Tu peux maintenant découvrir l'univers de Chloé, poser tes questions, ou écouter les histoires d'autres femmes qui ont vécu cette transformation.
+    </p>
+
+  </div>
+
+  <!-- ================================
+       BLOC 4 — Champ interactif
+       Apparaît 1500ms après l'événement "ended" de la vidéo YouTube.
+  ================================= -->
+  <div id="chatSection">
+
+    <!-- Boutons de choix — disparaissent après le premier choix -->
+    <div id="choiceBtns">
+      <button class="choice-btn" data-choice="temoignages">Voir des témoignages</button>
+    </div>
+
+    <!-- Champ texte libre + bouton Envoyer -->
+    <div class="input-row">
+      <input
+        type="text"
+        id="chatInput"
+        class="chat-input"
+        placeholder="Tu as des questions sur Chloé ? Écris-les ici…"
+        disabled
+        autocomplete="off"
+      >
+      <button class="send-btn" id="sendBtn">Envoyer</button>
+    </div>
+
+  </div>
+
+  <!-- ================================
+       BLOC 5 — Zone de réponses
+       Vide au départ — se remplit vers le bas au fil des échanges.
+  ================================= -->
+  <div id="responseZone"></div>
+
+</div>
+
+<script>
+  /* ================================
+     Tracking — relaie les événements vers Google Sheets
+  ================================ */
+  function trackEvent(evenement, extra) {
+    fetch('/.netlify/functions/track', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(Object.assign({
+        timestamp:   new Date().toISOString(),
+        prenom:      localStorage.getItem('amoressence_prenom') || '',
+        email:       '',
+        choix:       '',
+        type_choix:  '',
+        reponse_gpt: '',
+        page:        'merci-netlify',
+        evenement
+      }, extra || {}))
+    }).catch(() => {});
+  }
+
+  /* ================================
+     Récupération du prénom
+     Transmis depuis optin.html via localStorage.
+     Fallback : "toi".
+  ================================ */
+  const prenom = (() => {
+    const val = localStorage.getItem('amoressence_prenom');
+    return (val && val.trim()) ? val.trim() : 'toi';
+  })();
+
+  /* ================================
+     Atmosphère progressive (grain + vignettage)
+  ================================ */
+  let atmosphereVignette = 0.16;
+  let atmosphereBg       = '#EFE4D4';
+
+  function hexToRgb(hex) {
+    return [
+      parseInt(hex.slice(1, 3), 16),
+      parseInt(hex.slice(3, 5), 16),
+      parseInt(hex.slice(5, 7), 16)
+    ];
+  }
+
+  function setAtmosphere(vignette, bgHex, transitionMs) {
+    const root   = document.documentElement;
+    const fromV  = atmosphereVignette;
+    const fromBg = hexToRgb(atmosphereBg);
+    const toBg   = hexToRgb(bgHex);
+    atmosphereVignette = vignette;
+    atmosphereBg       = bgHex;
+    const t0 = performance.now();
+    function step(now) {
+      const p = Math.min((now - t0) / transitionMs, 1);
+      const e = p < 0.5 ? 2 * p * p : -1 + (4 - 2 * p) * p;
+      root.style.setProperty('--vignette-opacity', (fromV + (vignette - fromV) * e).toFixed(4));
+      const r = Math.round(fromBg[0] + (toBg[0] - fromBg[0]) * e);
+      const g = Math.round(fromBg[1] + (toBg[1] - fromBg[1]) * e);
+      const b = Math.round(fromBg[2] + (toBg[2] - fromBg[2]) * e);
+      root.style.setProperty('--bg-color', `rgb(${r},${g},${b})`);
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  /* ================================
+     Utilitaires
+  ================================ */
+  function typewriter(el, text, speed, onDone) {
+    let i = 0;
+    el.textContent = '';
+    (function tick() {
+      if (i < text.length) { el.textContent += text[i++]; setTimeout(tick, speed); }
+      else if (onDone) onDone();
+    })();
+  }
+
+  function fadeIn(el, duration) {
+    el.style.transition = 'none';
+    el.style.opacity = '0';
+    void el.offsetWidth;
+    el.style.transition = `opacity ${duration || 800}ms ease-in-out`;
+    el.style.opacity = '1';
+  }
+
+  /* ================================
+     BLOC 1 — Séquence d'ouverture
+  ================================ */
+  const line1El = document.getElementById('line1');
+  const line2El = document.getElementById('line2');
+
+  // "Merci d'être là."
+  line1El.textContent = 'Merci d\'être là.';
+  line1El.style.display = 'block';
+  fadeIn(line1El, 1000);
+
+  // Bloc Chloé
+  setTimeout(() => {
+    const chloeBlock = document.getElementById('chloeBlock');
+    chloeBlock.style.display = 'flex';
+    fadeIn(chloeBlock, 1800);
+
+    // Ligne de transition vers la VSL
+    setTimeout(() => {
+      line2El.innerHTML = 'Ce que tu vas découvrir maintenant a déjà aidé plusieurs femmes qui s\'étaient perdues dans des relations douloureuses à retrouver leur valeur, à construire des relations plus saines, et à ne plus vivre avec cette peur silencieuse de finir seules.';
+      line2El.style.display = 'block';
+      fadeIn(line2El, 1000);
+
+      setTimeout(showVSL, 2000);
+    }, 2000);
+
+  }, 2000);
+
+  /* ================================
+     BLOCS 2 & 3 — VSL + bouton
+  ================================ */
+  const vslSection = document.getElementById('vslSection');
+
+  function showVSL() {
+    vslSection.classList.add('visible');
+    setAtmosphere(0.18, '#ECE0CE', 2000);
+    loadYouTubeAPI();
+  }
+
+  /* ================================
+     YouTube IFrame API
+     Déclenchement du champ interactif :
+     - Si play détecté → attendre ended ou pause.
+     - Si aucun play dans les 2s → déclencher immédiatement (même séquence que ended).
+  ================================ */
+  let player;
+  let playDetected  = false;
+  let chatTriggered = false;
+  let noPlayTimer;
+
+  function triggerChat() {
+    if (chatTriggered) return;
+    chatTriggered = true;
+    clearTimeout(noPlayTimer);
+
+    const btn = document.getElementById('calendlyBtn');
+    btn.style.transition = 'opacity 900ms ease-in-out';
+    btn.style.opacity = '1';
+    btn.style.pointerEvents = 'auto';
+
+    setTimeout(() => {
+      fadeIn(document.getElementById('universeText'), 1200);
+    }, 800);
+
+    setTimeout(showChatSection, 2000);
+  }
+
+  function loadYouTubeAPI() {
+    const tag = document.createElement('script');
+    tag.src = 'https://www.youtube.com/iframe_api';
+    document.head.appendChild(tag);
+
+    // Si aucun play détecté après 2s → déclencher la séquence
+    noPlayTimer = setTimeout(() => {
+      if (!playDetected) triggerChat();
+    }, 2500);
+  }
+
+  window.onYouTubeIframeAPIReady = function () {
+    player = new YT.Player('ytPlayer', {
+      events: { onStateChange: onPlayerStateChange }
+    });
+  };
+
+  function onPlayerStateChange(e) {
+    if (e.data === YT.PlayerState.PLAYING) {
+      playDetected = true;
+      clearTimeout(noPlayTimer);
+    }
+    if (e.data === YT.PlayerState.ENDED || e.data === YT.PlayerState.PAUSED) {
+      triggerChat();
+    }
+  }
+
+  /* ================================
+     BLOC 4 — Champ interactif
+  ================================ */
+  const chatSection  = document.getElementById('chatSection');
+  const choiceBtns   = document.getElementById('choiceBtns');
+  const chatInput    = document.getElementById('chatInput');
+  const sendBtn      = document.getElementById('sendBtn');
+  const responseZone = document.getElementById('responseZone');
+
+  const FALLBACK_MSG = "Je n'ai pas pu charger une réponse. Tu peux poser ta question directement à Chloé lors de votre échange.";
+
+  /* Réponses locales pour les boutons de choix — pas d'appel API */
+  const CHOICE_REPLIES = {
+    temoignages: "Voici ce que des femmes ont vécu après avoir travaillé avec Chloé."
+  };
+
+  let exchangeCount       = 0;
+  let choiceDone          = false;
+  let sending             = false;
+  const conversationHistory = [];
+
+  function showChatSection() {
+    chatSection.classList.add('visible');
+    setAtmosphere(0.20, '#E9DCCA', 2000);
+    // Première réponse automatique
+    setTimeout(() => {
+      addResponse(null, 'Tu peux poser toutes tes questions sur Chloé ici. Tu peux aussi découvrir des témoignages de femmes qui ont travaillé avec elle.', false);
+      activateInput();
+    }, 2000);
+  }
+
+  /* Boutons de choix prédéfinis */
+  choiceBtns.querySelectorAll('.choice-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (choiceDone) return;
+      choiceDone = true;
+      hideChoiceBtns();
+      activateInput();
+      const key      = btn.dataset.choice;
+      const showCards = key === 'temoignages';
+      const reply    = CHOICE_REPLIES[key] || FALLBACK_MSG;
+      addResponse(btn.textContent.trim(), { text: reply, cards: showCards });
+    });
+  });
+
+  function hideChoiceBtns() {
+    choiceBtns.style.opacity = '0';
+    setTimeout(() => { choiceBtns.style.display = 'none'; }, 420);
+  }
+
+  function activateInput() {
+    chatInput.disabled = false;
+    chatInput.focus();
+  }
+
+  /* Envoi texte libre */
+  sendBtn.addEventListener('click', handleSend);
+  chatInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
+  });
+
+  function handleSend() {
+    const text = chatInput.value.trim();
+    if (!text || chatInput.disabled || sending) return;
+    sending = true;
+    chatInput.disabled = true;
+    sendBtn.disabled   = true;
+
+    if (!choiceDone) {
+      choiceDone = true;
+      hideChoiceBtns();
+    }
+
+    const userText = text;
+    chatInput.style.opacity = '0';
+    chatInput.style.filter  = 'blur(2px) saturate(0.1)';
+
+    setTimeout(async () => {
+      chatInput.value         = '';
+      chatInput.style.opacity = '';
+      chatInput.style.filter  = '';
+
+      showLoading();
+      trackEvent('question_' + (exchangeCount + 1));
+
+      let reply = FALLBACK_MSG;
+      let showCards = false;
+      try {
+        const res  = await fetch('/.netlify/functions/chat', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({
+            message: userText,
+            context: 'merci',
+            history: conversationHistory.slice(-6)
+          })
+        });
+        const data = await res.json();
+        reply = data.reply || FALLBACK_MSG;
+        showCards = !!data.show_cards;
+        conversationHistory.push({ role: 'user',      content: userText });
+        conversationHistory.push({ role: 'assistant', content: reply    });
+      } catch { trackEvent('fallback_calendly'); }
+
+      addResponse(userText, showCards ? { text: reply, cards: true } : reply);
+      chatInput.disabled = false;
+      sendBtn.disabled   = false;
+      sending            = false;
+      chatInput.focus();
+    }, 650);
+  }
+
+  /* ================================
+     BLOC 5 — Zone de réponses
+     Une seule réponse visible à la fois.
+     Chaque nouvelle réponse dissout la précédente (encre 600ms)
+     et réécrit au même endroit en typewriter.
+  ================================ */
+  const responseEl = document.createElement('p');
+  responseEl.className = 'response-text';
+  responseZone.appendChild(responseEl);
+
+  let cardsContainer     = null;
+  let responseHasContent = false;
+
+  function addResponse(userMsg, responseData, shouldScroll = true) {
+    exchangeCount++;
+    const atmosphereByExchange = [
+      [0.22, '#E6D8C5'],
+      [0.24, '#E3D4C1'],
+      [0.26, '#E0D0BC']
+    ];
+    const idx = Math.min(exchangeCount, 3) - 1;
+    setAtmosphere(atmosphereByExchange[idx][0], atmosphereByExchange[idx][1], 1500);
+    const responseText = typeof responseData === 'object' ? responseData.text : responseData;
+    const showCards    = typeof responseData === 'object' && responseData.cards;
+
+    function write() {
+      if (cardsContainer) { cardsContainer.remove(); cardsContainer = null; }
+      responseEl.textContent = responseText;
+      fadeIn(responseEl, 800);
+      setTimeout(() => {
+        if (showCards) {
+          cardsContainer = document.createElement('div');
+          cardsContainer.innerHTML = testimonialsHTML();
+          responseEl.after(cardsContainer);
+          fadeIn(cardsContainer, 600);
+        }
+        if (shouldScroll) scrollToEl(responseEl);
+        if (exchangeCount >= 3) showCTA();
+      }, 900);
+    }
+
+    if (responseHasContent) {
+      // Dissolution encre sur le texte existant
+      responseEl.style.opacity = '0';
+      responseEl.style.filter  = 'blur(2px) saturate(0.1)';
+      if (cardsContainer) {
+        cardsContainer.style.transition = 'opacity 600ms ease-in-out';
+        cardsContainer.style.opacity    = '0';
+      }
+      setTimeout(() => {
+        responseEl.style.transition = '';
+        responseEl.style.opacity    = '';
+        responseEl.style.filter     = '';
+        write();
+      }, 650);
+    } else {
+      responseHasContent = true;
+      write();
+    }
+  }
+
+  function scrollToEl(el) {
+    setTimeout(() => {
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 150);
+  }
+
+  /* CTA au 3ème échange */
+  let ctaShown = false;
+
+  function showCTA() {
+    if (ctaShown) return;
+    ctaShown = true;
+    trackEvent('cta_calendly');
+
+    const cta = document.createElement('div');
+    cta.className = 'cta-block';
+
+    const nudge = document.createElement('p');
+    nudge.className = 'cta-nudge';
+    nudge.textContent = 'Si tu te sens prête, Chloé serait heureuse d\'échanger avec toi.';
+
+    /* Remplacer href="#" par l'URL Calendly de Chloé */
+    const btn = document.createElement('a');
+    btn.href = 'https://calendly.com/chloe-facilitationequine/30min';
+    btn.target = '_blank';
+    btn.rel = 'noopener';
+    btn.className = 'calendly-btn';
+    btn.textContent = 'Je veux parler à Chloé';
+
+    cta.appendChild(nudge);
+    cta.appendChild(btn);
+    responseZone.appendChild(cta);
+
+    setTimeout(() => {
+      void cta.offsetWidth;
+      cta.classList.add('visible');
+      scrollToEl(cta);
+    }, 500);
+  }
+
+  /* ================================
+     showLoading — indicateur d'attente API
+  ================================ */
+  function showLoading() {
+    if (responseHasContent) {
+      responseEl.style.transition = 'opacity 500ms ease-in-out, filter 500ms ease-in-out';
+      responseEl.style.opacity    = '0';
+      responseEl.style.filter     = 'blur(2px) saturate(0.1)';
+      if (cardsContainer) {
+        cardsContainer.style.transition = 'opacity 500ms ease-in-out';
+        cardsContainer.style.opacity    = '0';
+        setTimeout(() => { if (cardsContainer) { cardsContainer.remove(); cardsContainer = null; } }, 520);
+      }
+      setTimeout(() => {
+        responseEl.style.transition = '';
+        responseEl.style.opacity    = '';
+        responseEl.style.filter     = '';
+        responseEl.textContent      = '…';
+      }, 520);
+    } else {
+      responseHasContent      = true;
+      responseEl.textContent  = '…';
+    }
+  }
+
+  /* ================================
+     HTML des cards témoignages placeholder
+     <!-- Remplacer par les vrais témoignages -->
+  ================================ */
+  function testimonialsHTML() {
+    const card = (prenom, videoId) => `
+      <div class="testimonial-card">
+        <p class="testimonial-name">${prenom}</p>
+        <div style="position:relative;width:100%;padding-bottom:177.78%;height:0;overflow:hidden;border-radius:12px;margin-top:8px;">
+          <iframe
+            src="https://www.youtube.com/embed/${videoId}"
+            style="position:absolute;top:0;left:0;width:100%;height:100%;border:none;border-radius:12px;"
+            allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowfullscreen
+            loading="lazy">
+          </iframe>
+        </div>
+      </div>`;
+
+    return `<div class="testimonials-mini">
+      ${card('Camille', '5dVa14e4gzU')}
+      ${card('Élodie',  'vB5GJG81jFM')}
+      ${card('Sophie',  'W6LNC6emRdA')}
+    </div>`;
+  }
+</script>
+
+<footer class="legal-footer">
+  <a href="CGV%20Amoressence.pdf" target="_blank" rel="noopener">CGV</a>
+  <span class="legal-footer-sep" aria-hidden="true">·</span>
+  <a href="Politiques%20de%20confidentialit%C3%A9.pdf" target="_blank" rel="noopener">Politique de confidentialité</a>
+  <span class="legal-footer-sep" aria-hidden="true">·</span>
+  <a href="Mentions%20l%C3%A9gales.pdf" target="_blank" rel="noopener">Mentions légales</a>
+</footer>
+
+</body>
+</html>
