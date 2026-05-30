@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Redirection...</title>
+</head>
+<body>
+  <script>
+    const tunnels = [
+      { url: "https://amoressence.netlify.app", weight: 50 },
+      { url: "https://www.amoressence.fr/amour", weight: 50 }
+    ];
+
+    const rand = Math.random() * 100;
+    let cumul = 0;
+    for (const t of tunnels) {
+      cumul += t.weight;
+      if (rand < cumul) {
+        window.location.replace(t.url);
+        break;
+      }
+    }
+  </script>
+  <noscript>
+    <meta http-equiv="refresh" content="0;url=https://ton-tunnel.netlify.app">
+  </noscript>
+</body>
+</html>
