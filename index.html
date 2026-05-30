@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Amoressence — Commence ta reconstruction</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garant:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=Lora:ital@1&display=swap" rel="stylesheet">
+
+  <style>
+    /* ===========================
+       Variables
+    =========================== */
+    :root {
+      --bg:               #FAF6F1;
+      --bg-color:         #FAF6F1;
+      --terracotta:       #C9856A;
+      --rose:             #E8C4B8;
+      --text:             #2C1810;
+      --text-sub:         #7A5C52;
+      --card-bg:          rgba(255, 255, 255, 0.6);
+      --trans:            0.4s ease-in-out;
+      --grain-opacity:    0.04;
+      --vignette-opacity: 0.00;
+    }
+
+    /* ===========================
+       Reset & base
+    =========================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html { font-size: 16px; }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 400;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      /*
+        padding-top : espace réservé au logo fixe (top:40px + ~40px hauteur + 40px air)
+        Le contenu central se centre dans l'espace sous cette réserve.
+      */
+      padding: 120px 20px 80px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Vignettage progressif */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9998;
+      background: radial-gradient(ellipse at center, transparent 40%, rgba(44,24,16,var(--vignette-opacity)) 100%);
+    }
+
+    /* Grain texture — fond fixe, ne bouge jamais */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 9999;
+      opacity: var(--grain-opacity);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-size: 300px 300px;
+    }
+
+    /* ===========================
+       Container principal
+    =========================== */
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 600px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ===========================
+       En-tête marque — FIXE
+       Découplé du flux du contenu central.
+       Reste immobile quelle que soit l'étape.
+    =========================== */
+    .brand-header {
+      position: fixed;
+      top: 40px;
+      left: 0;
+      right: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      z-index: 100;
+      opacity: 0;
+      animation: fadeInUp 0.6s ease-in-out 0.1s both;
+    }
+
+    .brand-name {
+      font-family: 'Cormorant Garant', serif;
+      font-size: clamp(1rem, 3vw, 1.35rem);
+      font-weight: 300;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: var(--terracotta);
+    }
+
+    .brand-divider {
+      width: 36px;
+      height: 1px;
+      background: var(--rose);
+    }
+
+    /* ===========================
+       Zone centrale conversationnelle
+
+       LAYOUT STABLE :
+       - min-height fixe = hauteur des 4 cards au Beat 1
+         → le conteneur ne rétrécit jamais entre les beats
+       - align-items: flex-start → le contenu s'ancre en haut
+         et pousse vers le bas uniquement (jamais vers le haut)
+    =========================== */
+    #centralZone {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 28px;
+      min-height: 420px;
+    }
+
+    /* ===========================
+       Beat 1 — Headline
+    =========================== */
+    .step-headline {
+      width: 100%;
+      font-family: 'Lora', serif;
+      font-style: italic;
+      font-size: clamp(1.2rem, 3.5vw, 1.6rem);
+      font-weight: 400;
+      text-align: left;
+      color: #5C3B2E;
+      line-height: 1.4;
+      opacity: 0;
+      animation: fadeInUp 0.6s ease-in-out 0.45s both;
+    }
+
+    /* ===========================
+       Beat 1 — Texte intro
+    =========================== */
+    .intro-sub {
+      width: 100%;
+      font-family: 'Lora', serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: clamp(1.2rem, 3.5vw, 1.6rem);
+      color: #5C3B2E;
+      line-height: 1.75;
+      opacity: 0;
+      animation: fadeInUp 0.5s ease-in-out 0.3s both;
+    }
+
+    /* ===========================
+       Beat 1 — Cards émotionnelles
+    =========================== */
+    .cards-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      width: 100%;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1.5px solid var(--rose);
+      border-radius: 18px;
+      padding: 20px 24px;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.975rem;
+      font-weight: 400;
+      color: var(--text);
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: border-color var(--trans), box-shadow var(--trans), transform var(--trans), background var(--trans);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      -webkit-appearance: none;
+      appearance: none;
+      opacity: 0;
+      animation: fadeInUp 0.5s ease-in-out both;
+    }
+
+    .card:nth-child(1) { animation-delay: 0.5s; }
+    .card:nth-child(2) { animation-delay: 0.65s; }
+    .card:nth-child(3) { animation-delay: 0.80s; }
+    .card:nth-child(4) { animation-delay: 0.95s; }
+
+    .card:hover {
+      border-color: var(--terracotta);
+      box-shadow: 0 6px 24px rgba(201, 133, 106, 0.13);
+      transform: translateY(-2px);
+      background: rgba(232, 196, 184, 0.18);
+    }
+
+    .card.selected {
+      border-color: var(--terracotta);
+      background: rgba(201, 133, 106, 0.08);
+    }
+
+    .card-indicator {
+      width: 18px;
+      height: 18px;
+      min-width: 18px;
+      border-radius: 50%;
+      border: 2px solid var(--rose);
+      transition: border-color var(--trans), background var(--trans), box-shadow var(--trans);
+    }
+
+    .card:hover .card-indicator {
+      border-color: var(--terracotta);
+    }
+
+    .card.selected .card-indicator {
+      border-color: var(--terracotta);
+      background: var(--terracotta);
+      box-shadow: 0 0 0 3px rgba(201, 133, 106, 0.18);
+    }
+
+    /* ===========================
+       Beat 1 — Zone texte libre (4ème card)
+       Masquée par défaut, apparaît en fade-in
+       quand la 4ème card est sélectionnée.
+    =========================== */
+    #autreZone {
+      width: 100%;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* ===========================
+       Beats 2 & 3 — Texte typewriter
+    =========================== */
+    .typewriter-text {
+      width: 100%;
+      font-family: 'Lora', serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: clamp(1.2rem, 3.5vw, 1.6rem);
+      color: #5C3B2E;
+      line-height: 1.75;
+      text-align: left;
+    }
+
+    /* Beat 3 — conteneur des deux lignes successives */
+    .typewriter-block {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+      width: 100%;
+    }
+
+    /* ===========================
+       Beats 2 & 3 — Question
+    =========================== */
+    .beat-question {
+      width: 100%;
+      font-family: 'Lora', serif;
+      font-style: italic;
+      font-size: clamp(1.2rem, 3.5vw, 1.6rem);
+      font-weight: 400;
+      color: #5C3B2E;
+      text-align: left;
+      line-height: 1.4;
+    }
+
+    /* ===========================
+       Beats 2 & 3 — Groupe input + bouton
+    =========================== */
+    .beat-input-group {
+      width: 100%;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* ===========================
+       Champs & bouton
+    =========================== */
+    .input-field {
+      width: 100%;
+      padding: 16px 22px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1.5px solid var(--rose);
+      border-radius: 50px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      color: var(--text);
+      outline: none;
+      transition: border-color var(--trans), box-shadow var(--trans);
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .input-field::placeholder {
+      color: #C4A49A;
+    }
+
+    .input-field:focus {
+      border-color: var(--terracotta);
+      box-shadow: 0 0 0 3px rgba(201, 133, 106, 0.11);
+    }
+
+    /* Variante pour le textarea — même douceur, coins moins ronds */
+    .textarea-field {
+      border-radius: 18px;
+      resize: none;
+      line-height: 1.6;
+    }
+
+    .cta-btn {
+      width: 100%;
+      padding: 18px 28px;
+      background: var(--terracotta);
+      color: #FFF9F6;
+      border: none;
+      border-radius: 50px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      transition: background var(--trans), transform 0.3s ease-in-out, box-shadow var(--trans);
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    .cta-btn:hover {
+      background: #b87460;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px rgba(201, 133, 106, 0.28);
+    }
+
+    .cta-btn:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    /* ===========================
+       Animations
+    =========================== */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ===========================
+       Responsive — mobile
+    =========================== */
+    @media (max-width: 480px) {
+      body {
+        padding: 110px 16px 68px;
+        justify-content: flex-start;
+      }
+
+      #centralZone {
+        min-height: 360px;
+      }
+
+      .card {
+        padding: 18px 20px;
+      }
+    }
+
+    /* ===========================
+       Footer légal
+    =========================== */
+    .legal-footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 10000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      padding: 10px 20px;
+      background: rgba(250, 246, 241, 0.90);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+
+    .legal-footer a {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.7rem;
+      color: var(--text-sub);
+      text-decoration: none;
+      letter-spacing: 0.02em;
+      transition: color 0.3s ease;
+    }
+
+    .legal-footer a:hover { color: var(--terracotta); }
+
+    .legal-footer-sep {
+      color: var(--rose);
+      font-size: 0.7rem;
+      user-select: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ================================
+       Logo — position fixe, hors flux
+       Ne bouge jamais quelle que soit l'étape.
+  ================================= -->
+  <header class="brand-header">
+    <p class="brand-name">Amoressence</p>
+    <div class="brand-divider" aria-hidden="true"></div>
+  </header>
+
+  <div class="container">
+
+    <!-- ================================
+         Zone centrale unique
+         min-height fixe = hauteur des 4 cards au Beat 1
+         align-items: flex-start = contenu ancré en haut, pousse vers le bas
+    ================================= -->
+    <div id="centralZone" aria-live="polite">
+
+      <!-- ---- BEAT 1 — contenu statique initial ---- -->
+      <p class="intro-sub">J'ai imaginé cet espace pour les femmes qui sentent qu'elles se sont éloignées d'elles-mêmes.</p>
+
+      <h1 class="step-headline">En ce moment, tu te sens plutôt…</h1>
+
+      <div class="cards-grid" role="radiogroup" aria-label="Choisis l'état qui te ressemble le plus">
+
+        <button class="card" data-state="perdue" role="radio" aria-checked="false">
+          <span class="card-indicator" aria-hidden="true"></span>
+          <span>Perdue — tu ne sais plus qui tu es</span>
+        </button>
+
+        <button class="card" data-state="colere" role="radio" aria-checked="false">
+          <span class="card-indicator" aria-hidden="true"></span>
+          <span>En colère — mais tu ne sais pas contre quoi</span>
+        </button>
+
+        <button class="card" data-state="prete" role="radio" aria-checked="false">
+          <span class="card-indicator" aria-hidden="true"></span>
+          <span>Prête à reconstruire — mais tu ne sais pas par où commencer</span>
+        </button>
+
+        <!-- 4ème card — déclenche le champ texte libre ci-dessous -->
+        <button class="card" data-state="autre" role="radio" aria-checked="false">
+          <span class="card-indicator" aria-hidden="true"></span>
+          <span>Autre chose — dis-moi ce que tu ressens</span>
+        </button>
+
+      </div>
+
+      <!--
+        Zone texte libre — visible uniquement quand la 4ème card est sélectionnée.
+        Apparaît en fade-in doux juste sous les cards.
+      -->
+      <div id="autreZone" style="display:none" role="region" aria-label="Décris ce que tu ressens">
+        <textarea
+          class="input-field textarea-field"
+          id="autreInput"
+          rows="3"
+          maxlength="1000"
+          placeholder="Décris ce que tu ressens en ce moment…"
+          aria-label="Décris ce que tu ressens"
+        ></textarea>
+        <button type="button" class="cta-btn" id="autreBtn">Continuer</button>
+      </div>
+      <!-- ---- fin Beat 1 ---- -->
+
+    </div>
+
+  </div>
+
+<script>
+  /* ================================
+     Messages de validation — Beat 2
+     'autre' : message fixe quel que soit le contenu du textarea
+  ================================ */
+  const VALIDATION_MSGS = {
+    perdue: "Se sentir perdue après une telle relation, c'est normal. C'est souvent là que tout commence vraiment.",
+    colere: "Cette colère est un signal sain. Elle montre que tu reprends contact avec toi-même.",
+    prete:  "Savoir que tu veux avancer, c'est déjà un acte courageux. Il te faut juste un point de départ.",
+    autre:  "Ce que tu ressens est réel, et ça mérite d'être entendu. C'est déjà courageux de mettre des mots dessus."
+  };
+
+  let prenom       = '';
+  let locked       = false;
+  let autreReady   = false;
+  let state        = null;
+  let gptReponse   = '';
+  let messageLibre = '';     // texte exact tapé par la visiteuse dans "Autre chose"
+
+  /* ================================
+     Utilitaire — Typewriter
+  ================================ */
+  function typewriter(el, text, speed, onDone) {
+    el.textContent = '';
+    let i = 0;
+    (function step() {
+      if (i < text.length) {
+        el.textContent += text[i++];
+        setTimeout(step, speed);
+      } else if (onDone) {
+        onDone();
+      }
+    })();
+  }
+
+  /* ================================
+     Utilitaire — Fade-in
+  ================================ */
+  function fadeIn(el, displayType, duration) {
+    el.style.display    = displayType || 'block';
+    el.style.opacity    = '0';
+    el.style.transition = 'none';
+    void el.offsetWidth; // force reflow pour déclencher la transition
+    el.style.transition = `opacity ${duration || 600}ms ease-in-out`;
+    el.style.opacity    = '1';
+  }
+
+  /* ================================
+     Utilitaire — Dissolution encre
+     Fondu + blur + désaturation (600ms) sur l'élément cible.
+  ================================ */
+  function dissolveZone(el, onDone, duration) {
+    const d = duration || 1200;
+    el.style.transition = `opacity ${d}ms ease-in-out, filter ${d}ms ease-in-out`;
+    el.style.opacity    = '0';
+    el.style.filter     = 'blur(2px) saturate(0.1)';
+    setTimeout(() => {
+      el.style.transition = '';
+      el.style.opacity    = '';
+      el.style.filter     = '';
+      if (onDone) onDone();
+    }, d + 50);
+  }
+
+  /* ================================
+     Atmosphère progressive (grain + vignettage)
+  ================================ */
+  let atmosphereVignette = 0.00;
+  let atmosphereBg       = '#FAF6F1';
+
+  function hexToRgb(hex) {
+    return [
+      parseInt(hex.slice(1, 3), 16),
+      parseInt(hex.slice(3, 5), 16),
+      parseInt(hex.slice(5, 7), 16)
+    ];
+  }
+
+  function setAtmosphere(vignette, bgHex, transitionMs) {
+    const root   = document.documentElement;
+    const fromV  = atmosphereVignette;
+    const fromBg = hexToRgb(atmosphereBg);
+    const toBg   = hexToRgb(bgHex);
+    atmosphereVignette = vignette;
+    atmosphereBg       = bgHex;
+    const t0 = performance.now();
+    function step(now) {
+      const p = Math.min((now - t0) / transitionMs, 1);
+      const e = p < 0.5 ? 2 * p * p : -1 + (4 - 2 * p) * p;
+      root.style.setProperty('--vignette-opacity', (fromV + (vignette - fromV) * e).toFixed(4));
+      const r = Math.round(fromBg[0] + (toBg[0] - fromBg[0]) * e);
+      const g = Math.round(fromBg[1] + (toBg[1] - fromBg[1]) * e);
+      const b = Math.round(fromBg[2] + (toBg[2] - fromBg[2]) * e);
+      root.style.setProperty('--bg-color', `rgb(${r},${g},${b})`);
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  /* ================================
+     Beat 1 — Clic sur une card
+  ================================ */
+  document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('click', () => {
+      if (locked) return;
+
+      state = card.dataset.state;
+
+      // Sélection visuelle exclusive
+      document.querySelectorAll('.card').forEach(c => {
+        c.classList.remove('selected');
+        c.setAttribute('aria-checked', 'false');
+      });
+      card.classList.add('selected');
+      card.setAttribute('aria-checked', 'true');
+
+      if (state === 'autre') {
+        // Cas spécial : affiche le textarea, ne déclenche pas encore la transition
+        const az = document.getElementById('autreZone');
+        if (az.style.display === 'none' || az.style.display === '') {
+          fadeIn(az, 'flex');
+        }
+        if (!autreReady) {
+          setupAutreEvents();
+          autreReady = true;
+        }
+        setTimeout(() => document.getElementById('autreInput').focus(), 350);
+
+      } else {
+        // Cards normales : on cache l'autreZone si elle était visible,
+        // on verrouille et on lance le Beat 2
+        const az = document.getElementById('autreZone');
+        if (az) az.style.display = 'none';
+
+        locked = true;
+        setTimeout(() => runBeat2(state), 200);
+      }
+    });
+  });
+
+  /* ================================
+     Beat 1 — Validation du champ "Autre chose"
+  ================================ */
+  function setupAutreEvents() {
+    const input = document.getElementById('autreInput');
+    const btn   = document.getElementById('autreBtn');
+
+    async function submit() {
+      const val = input.value.trim();
+      if (!val) {
+        input.style.borderColor = 'var(--terracotta)';
+        input.style.boxShadow   = '0 0 0 3px rgba(201, 133, 106, 0.18)';
+        input.focus();
+        return;
+      }
+      locked = true;
+      btn.disabled    = true;
+      btn.textContent = '…';
+      messageLibre = val;
+      let customMsg;
+      try {
+        const res  = await fetch('/.netlify/functions/chat', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ message: val, context: 'optin' })
+        });
+        const data = await res.json();
+        customMsg  = data.reply;
+        gptReponse = data.reply || '';
+      } catch {}
+      runBeat2('autre', customMsg);
+    }
+
+    btn.addEventListener('click', submit);
+    // Enter sans Shift soumet — Shift+Enter insère un saut de ligne
+    input.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        submit();
+      }
+    });
+  }
+
+  /* ================================
+     Beat 2 — Validation émotionnelle + champ prénom
+  ================================ */
+  function runBeat2(state, customMsg) {
+    const zone = document.getElementById('centralZone');
+    setAtmosphere(0.08, '#F7EFE5', 2000);
+    dissolveZone(zone, () => {
+      zone.innerHTML = `
+        <p class="typewriter-text" id="twBeat2" style="opacity:0"></p>
+        <h2 class="beat-question" id="beatQ2" style="display:none">Comment t'appelles-tu ?</h2>
+        <div class="beat-input-group" id="beatInput2" style="display:none">
+          <input type="text" class="input-field" id="prenomField"
+                 placeholder="Ton prénom" autocomplete="given-name" maxlength="80">
+          <button type="button" class="cta-btn" id="btnBeat2">Répondre</button>
+        </div>
+      `;
+
+      const tw = document.getElementById('twBeat2');
+      tw.textContent = customMsg || VALIDATION_MSGS[state];
+      fadeIn(tw, 'block', 800);
+
+      setTimeout(() => {
+        fadeIn(document.getElementById('beatQ2'), 'block', 900);
+
+        setTimeout(() => {
+          fadeIn(document.getElementById('beatInput2'), 'flex');
+          setupBeat2Events();
+        }, 1200);
+
+      }, 2500);
+    }, 800);
+  }
+
+  function setupBeat2Events() {
+    const field = document.getElementById('prenomField');
+    const btn   = document.getElementById('btnBeat2');
+
+    function submit() {
+      const val = field.value.trim();
+      if (!val) {
+        field.style.borderColor = 'var(--terracotta)';
+        field.style.boxShadow   = '0 0 0 3px rgba(201, 133, 106, 0.18)';
+        field.focus();
+        return;
+      }
+      prenom = val;
+      runBeat3();
+    }
+
+    btn.addEventListener('click', submit);
+    field.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); submit(); }
+    });
+
+    setTimeout(() => field.focus(), 700);
+  }
+
+  /* ================================
+     Beat 3 — Bonjour [Prénom] + champ email
+  ================================ */
+  function runBeat3() {
+    const zone = document.getElementById('centralZone');
+    setAtmosphere(0.14, '#F2E8DA', 2500);
+    dissolveZone(zone, () => {
+      zone.innerHTML = `
+        <div class="typewriter-block">
+          <p class="typewriter-text" id="twBeat3a" style="opacity:0"></p>
+          <p class="typewriter-text" id="twBeat3b" style="display:none"></p>
+        </div>
+        <div class="beat-input-group" id="beatInput3" style="display:none">
+          <input type="email" class="input-field" id="emailField"
+                 placeholder="Ton adresse email" autocomplete="email">
+          <p id="emailError" style="display:none; color:var(--terracotta); font-size:0.82rem; padding:0 6px; margin-top:-4px;">Vérifie le format de ton adresse email (exemple : prenom@email.com).</p>
+          <button type="button" class="cta-btn" id="btnBeat3">Répondre</button>
+        </div>
+      `;
+
+      const a = document.getElementById('twBeat3a');
+      a.textContent = `Bonjour ${prenom}.`;
+      fadeIn(a, 'block', 1200);
+
+      setTimeout(() => {
+        const b = document.getElementById('twBeat3b');
+        b.textContent = 'Entre ton email pour commencer ta reconstruction.';
+        fadeIn(b, 'block', 1200);
+
+        setTimeout(() => {
+          fadeIn(document.getElementById('beatInput3'), 'flex', 1400);
+          setupBeat3Events();
+        }, 1800);
+
+      }, 2000);
+    }, 1400);
+  }
+
+  function setupBeat3Events() {
+    const field    = document.getElementById('emailField');
+    const btn      = document.getElementById('btnBeat3');
+    const emailReg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    const errorEl = document.getElementById('emailError');
+
+    function submit() {
+      const val = field.value.trim();
+      if (!emailReg.test(val)) {
+        field.style.borderColor = 'var(--terracotta)';
+        field.style.boxShadow   = '0 0 0 3px rgba(201, 133, 106, 0.18)';
+        errorEl.style.display   = 'block';
+        field.focus();
+        return;
+      }
+      errorEl.style.display = 'none';
+      runBeat4(val);
+    }
+
+    btn.addEventListener('click', submit);
+    field.addEventListener('input', () => {
+      errorEl.style.display   = 'none';
+      field.style.borderColor = '';
+      field.style.boxShadow   = '';
+    });
+    field.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); submit(); }
+    });
+
+    setTimeout(() => field.focus(), 700);
+  }
+
+  /* ================================
+     Beat 4 — Dissolution totale + redirect
+  ================================ */
+  function runBeat4(email) {
+    localStorage.setItem('amoressence_prenom', prenom);
+    fetch('/.netlify/functions/subscribe', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({
+        prenom,
+        email,
+        choix:         state || '',
+        type_choix:    state === 'autre' ? 'libre' : 'bouton',
+        message_libre: messageLibre,
+        reponse_gpt:   gptReponse
+      })
+    }).catch(() => {});
+
+    [document.querySelector('.container'), document.querySelector('.brand-header')].forEach(el => {
+      el.style.transition = 'opacity 700ms ease-in-out, filter 700ms ease-in-out';
+      el.style.opacity    = '0';
+      el.style.filter     = 'blur(3px) saturate(0)';
+    });
+
+    setTimeout(() => { window.location.href = 'merci.html'; }, 750);
+  }
+</script>
+
+<footer class="legal-footer">
+  <a href="CGV%20Amoressence.pdf" target="_blank" rel="noopener">CGV</a>
+  <span class="legal-footer-sep" aria-hidden="true">·</span>
+  <a href="Politiques%20de%20confidentialit%C3%A9.pdf" target="_blank" rel="noopener">Politique de confidentialité</a>
+  <span class="legal-footer-sep" aria-hidden="true">·</span>
+  <a href="Mentions%20l%C3%A9gales.pdf" target="_blank" rel="noopener">Mentions légales</a>
+</footer>
+
+</body>
+</html>
